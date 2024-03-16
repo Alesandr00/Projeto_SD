@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineON</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <video id="video" controls autoplay width="640" height="360">
+        <source src="http://localhost:3000/video" type="video/mp4">
+        <!-- requisição ao servidor e o tipo dele -->
+    </video>
+    <script>
+        var socket = io.connect('http://localhost:3000');
+        var video = document.getElementById('video');
+        video.ontimeupdate = function() {
+            socket.emit('time update', {'time': video.currentTime})
+        };
+        socket.on('connect', function() {
+            console.log('Connected to server');
+        });
+        socket.on('disconnect', function() {
+            console.log('Disconnected from server');
+        });
+        socket.on('play', function(data) {
+            video.currentTime = data.time;
+            video.play();
+        });
+    </script>
+</body>
+</html>

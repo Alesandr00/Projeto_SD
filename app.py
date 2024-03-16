@@ -1,12 +1,51 @@
-from flask import Flask, render_template
+from flask import Flask, send_file, request, abort
+from flask_socketio import SocketIO, emit
+import os
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'chave_secreta'
+# Criando a aplicação Flask e definindo a pasta de vídeos estáticos
+app = Flask(__name__, static_folder='videos')
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Rota para a página inicial
-@app.route('/')
-def index():
-    return render_template('index.html')
+# Variável global para armazenar a posição atual do vídeo
+video_time = 0
 
+# Definindo a rota para acessar o vídeo
+@app.route('/video')
+def video():
+    try:
+        # Definindo o caminho para o vídeo
+        caminho_video = 'videos/video.mp4'
+        # Verifica se o arquivo de vídeo existe
+        if not os.path.exists(caminho_video):
+            abort(404)  # Arquivo não encontrado
+        # Enviando arquivo de vídeo completo
+        return send_file(caminho_video, mimetype='video/mp4')
+    except Exception as e:
+        print(f'Erro ao servir o vídeo: {e}')
+        abort(500)  # Erro interno do servidor
+
+@socketio.on('connect')
+def handle_connect():
+    try:
+        print('Client connected: ' + request.sid)
+        # Emitir o evento 'play' para o novo cliente com a posição atual do vídeo
+        emit('play', {'time': video_time})
+    except ConnectionAbortedError:
+        print('Connection aborted')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected: ' + request.sid)
+
+@socketio.on('time update')
+def handle_time_update(data):
+    global video_time
+    # Validação dos dados recebidos
+    if 'time' in data and isinstance(data['time'], (int, float)):
+        video_time = data['time']
+    else:
+        print('Dados inválidos recebidos para atualização de tempo')
+
+# Iniciando a aplicação Flask
 if __name__ == '__main__':
-    app.run()
+    socketio.run(app, port=3000)
