@@ -5,15 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CineON</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #a08888;
+        }
+        #video-chat-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        #header {
+            background-color: #1a73e8;
+            color: #ffffff;
+            font-size: 24px;
+            padding: 20px;
+            text-align: center;
+        }
+        #video {
+            margin-top: 30px;
+            width: 80%;
+            max-width: 800px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #chat {
+            width: 80%;
+            max-width: 800px;
+            height: 36%;
+            border-radius: 10px;
+            background-color: #e3bbbb;
+            overflow: auto;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #message-form {
+            width: 80%;
+            max-width: 800px;
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        #message-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        #message-input:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+        #message-input::placeholder {
+            color: #aaa;
+        }
+        #message-input::-webkit-input-placeholder {
+            color: #aaa;
+        }
+        #message-input::-moz-placeholder {
+            color: #aaa;
+        }
+        #message-input:-ms-input-placeholder {
+            color: #aaa;
+        }
+        #message-input::placeholder-shown {
+            color: #aaa;
+        }
+        #message-input[type="submit"] {
+            background-color: #1a73e8;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        #message-input[type="submit"]:hover {
+            background-color: #0d6efd;
+        }
+    </style>
 </head>
 <body>
-    <video id="video" controls autoplay width="640" height="360">
-        <source src="http://localhost:3000/video" type="video/mp4">
-        <!-- requisição ao servidor e o tipo dele -->
-    </video>
+    <div id="video-chat-container">
+        <div id="header">CineON</div>
+        <video id="video" controls muted autoplay>
+            <source src="http://localhost:3000/video" type="video/mp4">
+        </video>
+        <div id="chat"></div>
+        <form id="message-form">
+            <input id="message-input" type="text" placeholder="Digite uma mensagem">
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
     <script>
         var socket = io.connect('http://localhost:3000');
         var video = document.getElementById('video');
+        var chat = document.getElementById('chat');
+        var messageForm = document.getElementById('message-form');
+        var messageInput = document.getElementById('message-input');
         video.ontimeupdate = function() {
             socket.emit('time update', {'time': video.currentTime})
         };
@@ -26,6 +121,18 @@
         socket.on('play', function(data) {
             video.currentTime = data.time;
             video.play();
+        });
+        socket.on('message', function(data) {
+            var p = document.createElement('p');
+            p.innerText = data;
+            chat.appendChild(p);
+            chat.scrollTop = chat.scrollHeight;
+        });
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var message = messageInput.value;
+            socket.emit('message', message);
+            messageInput.value = '';
         });
     </script>
 </body>
