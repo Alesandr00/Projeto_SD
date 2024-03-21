@@ -1,6 +1,7 @@
 from flask import Flask, send_file, request, abort
 from flask_socketio import SocketIO, emit
 import os
+import time
 
 # Criando a aplicação Flask e definindo a pasta de vídeos estáticos
 app = Flask(__name__, static_folder='videos')
@@ -26,12 +27,9 @@ def video():
 
 @socketio.on('connect')
 def handle_connect():
-    try:
-        print('Client connected: ' + request.sid)
-        # Emitir o evento 'play' para o novo cliente com a posição atual do vídeo
-        emit('play', {'time': video_time})
-    except ConnectionAbortedError:
-        print('Connection aborted')
+    print('Client connected: ' + request.sid)
+    # Emitir o evento 'play' para o novo cliente com a posição atual do vídeo
+    emit('play', {'time': video_time})
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -45,7 +43,18 @@ def handle_time_update(data):
         video_time = data['time']
     else:
         print('Dados inválidos recebidos para atualização de tempo')
+        
+@socketio.on('message')
+def handle_message(data):
+    print('Received message:', data)
+    emit('message', data, broadcast=True)  # Emitir a mensagem recebida para todos os clientes
 
-# Iniciando a aplicação Flask
+# Evento para enviar o nome do usuário quando entrar
+@socketio.on('username')
+def handle_username(data):
+    print('Received username:', data['username'])
+    emit('message', {'username': 'System','message': f'{data["username"]} - entrou no chat'}, broadcast=True)
+
+
 if __name__ == '__main__':
     socketio.run(app, port=3000)
