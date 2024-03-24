@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineON</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <div id="video-chat-entrada">
+        <!-- Formulário para inserir o nome do usuário -->
+        <form class="nome-usuario" id="username-form">
+            <label for="username-input">Digite seu nome:</label>
+            <input type="text" id="username-input" placeholder="Seu nome aqui" required>
+            <button type="submit">Entrar</button>
+        </form>
+        <!-- Vídeo e chat ficam ocultos até que o usuário entre com o nome -->
+        <video id="video" controls style="display: none;">
+            <source src="http://localhost:3000/video" type="video/mp4">
+        </video>
+        <div id="chat" style="display: none;"></div>
+            <!-- Formulário para enviar mensagens -->
+        <form id="message-form" style="display: none;">
+            <input id="message-input" type="text" placeholder="Digite uma mensagem">
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
