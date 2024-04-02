@@ -25,7 +25,7 @@ def video():
 @socketio.on('connect')
 def handle_connect():
     print('Client connected: ' + request.sid)
-    emit('play', {'time': video_time})
+    emit('play', {'time': video_time}, broadcast=True)
 
 @socketio.on('disconnect')
 def handle_disconnect():
