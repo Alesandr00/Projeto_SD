@@ -1,4 +1,4 @@
-var socket = io.connect('http://localhost:3000');
+var socket = io.connect('http://10.50.198.131:3000');  // Trocar pelo ip que o servidor está
 var video = document.getElementById('video');
 var chat = document.getElementById('chat');
 var messageForm = document.getElementById('message-form');
@@ -8,13 +8,13 @@ var usernameInput = document.getElementById('username-input');
 var isSeeking = false;
 var lastSentTime = 0;
 
-video.ontimeupdate = function() {
-    socket.emit('time update', {'time': video.currentTime})
-};
-
 socket.on('play', function(data) {
     video.currentTime = data.time;
-    video.play();
+    video.play(); // Adicionado o play automático
+});
+
+socket.on('time update', function(data) {
+    video.currentTime = data.time;
 });
 
 socket.on('message', function(data) {
@@ -41,6 +41,12 @@ function showVideoAndChat() {
     video.style.display = 'block';
     chat.style.display = 'block';
     messageForm.style.display = 'flex';
+
+    setInterval(function() {
+        if (!isSeeking) {
+            socket.emit('time update', { time: video.currentTime });
+        }
+    }, 15000);
 }
 
 messageForm.addEventListener('submit', function(e) {
