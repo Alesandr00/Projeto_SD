@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CineON</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
 <body>
     <div id="video-chat-entrada">
@@ -17,7 +16,7 @@
         </form>
         <!-- Vídeo e chat ficam ocultos até que o usuário entre com o nome -->
         <video id="video" controls style="display: none;">
-            <source src="http://localhost:3000/video" type="video/mp4">
+            <source src="{{ url_for('video') }}?time={{ video_time }}" type="video/mp4">
         </video>
         <div id="chat" style="display: none;"></div>
             <!-- Formulário para enviar mensagens -->
@@ -26,6 +25,7 @@
             <button type="submit">Enviar</button>
         </form>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
