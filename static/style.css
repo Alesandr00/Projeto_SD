@@ -54,9 +54,13 @@ body.nome-digitado #video-chat-entrada {
     font-weight: bold;
 }
 #message-form button[type="submit"] {
+    width: 20%;
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
     background-color: #e50914;
     color: #fff;
-    font-size: 10px;
+    font-size: 12px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
